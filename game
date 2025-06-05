@@ -1,0 +1,1019 @@
+#include<iostream>                    // to use basic cin and cout functions
+#include<cstdlib>                    // for rand function
+#include<ctime>                     // for generating random candies
+#include<string>                   //using this to get player name and string
+#include<Windows.h>               // using this library to add colors in candies
+#include<conio.h>                // to get moving key from player 
+#include<fstream>               // for file handling
+using namespace std;
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
+
+int score = 0; //scores count
+void filestr(string name, int score)
+{
+    ofstream myscore;
+    myscore.open("score.txt", ios::app); // Open in append mode
+    if (!myscore.is_open())
+    {
+        cout << "File cannot open.";
+    }
+    else
+    {
+        cout << "Writing contents to file: \n";
+        myscore << name << " " << score << endl; // Write name and score
+        myscore.close();
+    }
+}
+
+void delay(int milliseconds)          /* this function is use in animation in credit section   &&&&& for timer
+                                        sleep program for miliseconds*/
+{
+    Sleep(milliseconds);
+}
+
+void credit(const string& name)                      // for animation in credit section 
+{
+    for (char c : name)
+    {
+        cout << c << flush;
+        delay(100);                  // Adjust the duration to change animation speed
+    }
+    cout << endl;
+}
+// -------------------------------------- EASY MODE FUNCTIONS ---------------------------------------
+void sweet(char grid[8][8])               // sweet function is created to check if candies match then add score and also display message of sweet with match name  
+{
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {              // checking condition for L-Shape match
+            if (grid[i][j] == grid[i + 1][j] && grid[i][j] == grid[i + 2][j] && grid[i][j] == grid[i + 2][j + 1] && grid[i][j] == grid[i + 2][j + 2])                //L shape Condition spaces
+            {
+                grid[i][j] = ' ';
+                grid[i + 1][j] = ' ';
+                grid[i + 2][j] = ' ';
+                grid[i][j + 1] = ' ';
+                grid[i][j + 2] = ' ';
+                score += 25;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "          Lshape        " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("cls");
+
+            }
+            else if (grid[i][j] == grid[i + 1][j] && grid[i][j] == grid[i + 2][j])          // vertical condition
+            {
+                grid[i][j] = ' ';
+                grid[i + 1][j] = ' ';
+                grid[i + 2][j] = ' ';
+                score += 10;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "         Vertical       " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("CLS");
+
+            }
+            else if (grid[i][j] == grid[i][j + 1] && grid[i][j] == grid[i][j + 2])  // horizontal condition
+            {
+                grid[i][j] = ' ';
+                grid[i][j + 1] = ' ';
+                grid[i][j + 2] = ' ';
+                score += 10;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "        Horizontal      " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("CLS");
+
+            }
+            else if (grid[i][j] == grid[i - 1][j + 1] && grid[i][j] == grid[i + 1][j - 1])             // forward diaginal condition
+            {
+                grid[i][j] = ' ';
+                grid[i - 1][j + 1] = ' ';
+                grid[i + 1][j - 1] = ' ';
+                score += 20;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "      Forward Diagonal  " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("CLS");
+
+
+            }
+            else if (grid[i][j] == grid[i - 1][j - 1] && grid[i][j] == grid[i + 1][j + 1])         // backward diagonal condition
+            {
+                grid[i][j] = ' ';
+                grid[i - 1][j - 1] = ' ';
+                grid[i + 1][j + 1] = ' ';
+                score += 20;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "     Backward Diagonal  " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("CLS");
+
+
+            }
+
+        }
+
+    }
+}
+void DisplayGrid(char grid[8][8], int movesLeft, string name)    // moves left after swaping candies
+{
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    cout << "\n";
+    cout << "\t\t\t\t  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |" << endl;                    // to print row number later we will input row and column from player to swap candies
+    cout << "\t\t\t\t-----------------------------------------------------" << endl;
+    //cout << "\n";
+    cout << "\t\t\t\t0 | ";
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 8; j++)                                       //print grid with colors
+        {
+            if (grid[i][j] == '$')
+                SetConsoleTextAttribute(h, 1);
+
+            else if (grid[i][j] == '*')
+                SetConsoleTextAttribute(h, 2);
+
+            else if (grid[i][j] == '&')
+                SetConsoleTextAttribute(h, 3);
+
+            else if (grid[i][j] == '@')
+                SetConsoleTextAttribute(h, 4);
+
+            else if (grid[i][j] == '#')
+                SetConsoleTextAttribute(h, 5);
+
+            else if (grid[i][j] == '%')
+                SetConsoleTextAttribute(h, 6);
+
+            cout << " " << grid[i][j] << " ";
+            SetConsoleTextAttribute(h, 15);                          // to print text in white color after colorful candies
+            cout << " | ";
+        }
+        cout << endl;
+        cout << "\t\t\t\t-----------------------------------------------------";
+        if (i < 7)                                                    // to print columns number, later we will input row and column from player to swap candies
+            cout << endl << "\t\t\t\t" << i + 1 << " | ";                   // Print a new line and gap after each row
+    }
+    // Display scores and moves information
+    cout << "\n\n";
+    SetConsoleTextAttribute(h, 3);
+    cout << "\t\t\t\t Current Score: " << score;
+    SetConsoleTextAttribute(h, 12);
+    cout << "\tMoves Left: " << movesLeft << endl;
+    SetConsoleTextAttribute(h, 15);
+    if (movesLeft <= 0)
+        filestr(name, score);
+}
+char easycandy(char candies)
+{
+    int n = rand() % 6 + 1;
+    char ch;
+    if (n == 1)
+        ch = '$';
+    else if (n == 2)
+        ch = '*';
+    else if (n == 3)
+        ch = '%';
+    else if (n == 4)
+        ch = '&';
+    else if (n == 5)
+        ch = '@';
+    else if (n == 6)
+        ch = '#';
+    return ch;
+}
+
+void moveCandiesDown(char grid[8][8])
+{
+    for (int j = 0; j < 8; j++)
+    {
+        for (int i = 6; i >= 0; i--)
+        {
+            if (grid[i][j] != ' ')
+            {
+                // Move the non-empty cell to the first available empty cell below
+                int k = i;
+                while (k + 1 < 8 && grid[k + 1][j] == ' ')
+                {
+                    grid[k + 1][j] = grid[k][j];
+                    grid[k][j] = ' ';
+                    k++;
+                }
+            }
+        }
+    }
+}
+
+bool removematches(char grid[8][8])
+{
+    bool matchesFound = false;
+    for (int i = 0; i < 8; i++)
+    {
+        for (int j = 0; j < 6; j++)                                                     //j is less than 6 because when 6 is added to 2 then it will become 8
+        {
+            if (grid[i][j] == grid[i][j + 1] && grid[i][j] == grid[i][j + 2])            //for rows 
+            {
+                grid[i][j] = grid[i][j + 1] = grid[i][j + 2] = ' ';                      // Replace matched candies with empty spaces
+                matchesFound = true;
+            }
+        }
+    }
+    for (int j = 0; j < 8; j++)                                                      //i is less than 6 because when 6 is added to 2 then it will become 8
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (grid[i][j] == grid[i + 1][j] && grid[i][j] == grid[i + 2][j])      // for columns
+            {
+                grid[i][j] = grid[i + 1][j] = grid[i + 2][j] = ' ';              // Replace matched candies with empty spaces
+                matchesFound = true;
+            }
+        }
+    }
+    for (int i = 0; i < 6; i++)
+    {
+        for (int j = 0; j < 6; j++)
+        {
+            if (j + 2 < 8 && i + 2 < 8 &&
+                grid[i][j] == grid[i + 1][j + 1] && grid[i][j] == grid[i + 2][j + 2])
+            {
+                grid[i][j] = grid[i + 1][j + 1] = grid[i + 2][j + 2] = ' ';
+                matchesFound = true;
+            }
+        }
+    }
+    for (int i = 1; i < 7; i++)
+    {
+        for (int j = 1; j < 7; j++)
+        {
+            if (grid[i][j] == grid[i - 1][j + 1] && grid[i][j] == grid[i + 1][j - 1])
+            {
+                grid[i][j] = grid[i - 1][j + 1] = grid[i + 1][j - 1] = ' ';
+                matchesFound = true;
+            }
+        }
+    }
+    moveCandiesDown(grid);
+    return matchesFound;
+}
+
+void fillemptyspaces(char grid[8][8])
+{
+
+    bool matchesFound = true;
+    char c = ' ';                                                     // Character to fill empty spaces
+    // Traverse through each cell of the grid
+    while (matchesFound)
+    {
+        matchesFound = false;
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (grid[i][j] == ' ')                         // If an empty space is found
+                {
+                    grid[i][j] = easycandy(c);
+                }
+            }
+        }
+        matchesFound = removematches(grid);
+    }
+}
+
+void swpspaceeasy(char grid[8][8])
+{
+    for (int j = 0; j < 8; j++)       //starting from j = column and check each i = row with is empty then fill that space from top                     
+    {
+        for (int i = 1; i < 8; i++)
+        {
+            if (grid[i][j] == ' ')      // here it check condition 
+            {
+                for (int k = i; k > 0; k--)
+                {
+                    grid[k][j] = grid[k - 1][j];       //moving candies from top
+                }
+                grid[0][j] = ' ';               // move space to the top
+            }
+        }
+    }
+}
+//---------------------------------------  HARD MODE FUNCTIONS -------------------------------------------------
+void sweethard(char grid[10][10])
+{
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)
+        {
+            if (grid[i][j] == grid[i + 1][j] && grid[i][j] == grid[i + 2][j] && grid[i][j] == grid[i + 2][j + 1] && grid[i][j] == grid[i + 2][j + 2])                //L shape Condition spaces
+            {
+                grid[i][j] = ' ';
+                grid[i + 1][j] = ' ';
+                grid[i + 2][j] = ' ';
+                grid[i][j + 1] = ' ';
+                grid[i][j + 2] = ' ';
+                score += 25;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "         Lshape         " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("cls");
+
+            }
+            else if (grid[i][j] == grid[i + 1][j] && grid[i][j] == grid[i + 2][j])          // vertical condition
+            {
+                grid[i][j] = ' ';
+                grid[i + 1][j] = ' ';
+                grid[i + 2][j] = ' ';
+                score += 10;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "         vertical       " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("CLS");
+
+            }
+            else if (grid[i][j] == grid[i][j + 1] && grid[i][j] == grid[i][j + 2])  // horizontal condition
+            {
+                grid[i][j] = ' ';
+                grid[i][j + 1] = ' ';
+                grid[i][j + 2] = ' ';
+                score += 10;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "        horizontal      " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("CLS");
+
+            }
+            else if (grid[i][j] == grid[i - 1][j + 1] && grid[i][j] == grid[i + 1][j - 1])             // forward diaginal condition
+            {
+                grid[i][j] = ' ';
+                grid[i - 1][j + 1] = ' ';
+                grid[i + 1][j - 1] = ' ';
+                score += 20;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "     forward diagonal   " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("CLS");
+
+
+            }
+            else if (grid[i][j] == grid[i - 1][j - 1] && grid[i][j] == grid[i + 1][j + 1])         // backward diagonal condition
+            {
+                grid[i][j] = ' ';
+                grid[i - 1][j - 1] = ' ';
+                grid[i + 1][j + 1] = ' ';
+                score += 20;
+                system("CLS");
+                cout << "------------------------" << endl;
+                cout << "                        " << endl;
+                cout << "          SWEET         " << endl;
+                cout << "    backward diagonal   " << endl;
+                cout << "------------------------" << endl;
+                Sleep(500);
+                system("CLS");
+
+
+            }
+
+        }
+
+    }
+}
+char hardcandy(char candies)             // candies in hard mode
+{
+    int n = rand() % 7 + 1;
+    char ch;
+    if (n == 1)
+        ch = '$';
+    else if (n == 2)
+        ch = '*';
+    else if (n == 3)
+        ch = '%';
+    else if (n == 4)
+        ch = '&';
+    else if (n == 5)
+        ch = '@';
+    else if (n == 6)
+        ch = '#';
+    else if (n == 7)
+        ch = '=';
+
+    return ch;
+}
+void moveCandiesDownhard(char grid[10][10])                     // moving candies down in hard mode
+{
+    for (int j = 0; j < 10; j++)
+    {
+        for (int i = 8; i >= 0; i--)
+        {
+            if (grid[i][j] != ' ')
+            {
+                // Move the non-empty cell to the first available empty cell below
+                int k = i;
+                while (k + 1 < 10 && grid[k + 1][j] == ' ')
+                {
+                    grid[k + 1][j] = grid[k][j];
+                    grid[k][j] = ' ';
+                    k++;
+                }
+            }
+        }
+    }
+}
+bool removematcheshard(char grid[10][10])
+{
+    bool matchesFound = false;
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 8; j++)                                                     //j is less than 8 because when 8 is added to 2 then it will become 10
+        {
+            if (grid[i][j] == grid[i][j + 1] && grid[i][j] == grid[i][j + 2])            //for rows 
+            {
+                grid[i][j] = grid[i][j + 1] = grid[i][j + 2] = ' ';                      // Replace matched candies with empty spaces
+                matchesFound = true;
+            }
+        }
+    }
+    for (int j = 0; j < 10; j++)                                                      //i is less than 8 because when 8 is added to 2 then it will become 10
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            if (grid[i][j] == grid[i + 1][j] && grid[i][j] == grid[i + 2][j])      // for columns
+            {
+                grid[i][j] = grid[i + 1][j] = grid[i + 2][j] = ' ';              // Replace matched candies with empty spaces
+                matchesFound = true;
+            }
+        }
+    }
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 8; j++)
+        {
+            if (j + 2 < 10 && i + 2 < 10 &&
+                grid[i][j] == grid[i + 1][j + 1] && grid[i][j] == grid[i + 2][j + 2])
+            {
+                grid[i][j] = grid[i + 1][j + 1] = grid[i + 2][j + 2] = ' ';
+                matchesFound = true;
+            }
+        }
+    }
+    for (int i = 1; i < 9; i++)
+    {
+        for (int j = 1; j < 9; j++)
+        {
+            if (grid[i][j] == grid[i - 1][j + 1] && grid[i][j] == grid[i + 1][j - 1])
+            {
+                grid[i][j] = grid[i - 1][j + 1] = grid[i + 1][j - 1] = ' ';
+                matchesFound = true;
+            }
+        }
+    }
+    moveCandiesDownhard(grid);
+    return matchesFound;
+}
+void fillemptyspaceshard(char grid[10][10])
+{
+
+    bool matchesFound = true;
+    char c = ' ';                                                     // Character to fill empty spaces
+    // Traverse through each cell of the grid
+    while (matchesFound)
+    {
+        matchesFound = false;
+
+        for (int i = 0; i < 10; i++)
+        {
+            for (int j = 0; j < 10; j++)
+            {
+                if (grid[i][j] == ' ')                         // If an empty space is found
+                {
+                    grid[i][j] = hardcandy(c);
+                }
+            }
+        }
+        matchesFound = removematcheshard(grid);
+    }
+
+}
+void swpspachard(char grid[10][10])        // hard mode swpspace function
+{
+    for (int j = 0; j < 10; j++)       //starting from j = column and check each i = row with is empty then fill that space from top                     
+    {
+        for (int i = 1; i < 10; i++)
+        {
+            if (grid[i][j] == ' ')      // here it check condition 
+            {
+                for (int k = i; k > 0; k--)
+                {
+                    grid[k][j] = grid[k - 1][j];       //moving candies from top
+                }
+                grid[0][j] = ' ';               // move space to the top
+            }
+        }
+    }
+}
+void DisplayGridHard(char grid[10][10], int movesLeft, string name)         // hard mode display
+{
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    cout << "\n";
+    cout << "\t\t\t\t  |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  | " << endl;                    // to print row number later we will input row and column from player to swap candies
+    cout << "\t\t\t\t---------------------------------------------------------------" << endl;
+    cout << "\t\t\t\t0 | ";
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 10; j++)                                       //print grid with colors
+        {
+            if (grid[i][j] == '$')
+                SetConsoleTextAttribute(h, 1);
+
+            else if (grid[i][j] == '*')
+                SetConsoleTextAttribute(h, 2);
+
+            else if (grid[i][j] == '&')
+                SetConsoleTextAttribute(h, 3);
+
+            else if (grid[i][j] == '@')
+                SetConsoleTextAttribute(h, 4);
+
+            else if (grid[i][j] == '#')
+                SetConsoleTextAttribute(h, 5);
+
+            else if (grid[i][j] == '%')
+                SetConsoleTextAttribute(h, 6);
+            else if (grid[i][j] == '=')
+                SetConsoleTextAttribute(h, 14);
+
+            cout << " " << grid[i][j] << " ";
+            SetConsoleTextAttribute(h, 15);                          // to print text in white color after colorful candies
+            cout << " | ";
+        }
+        cout << endl;
+        cout << "\t\t\t\t---------------------------------------------------------------" << endl;
+        if (i < 9)                                                    // to print columns number, later we will input row and column from player to swap candies
+            cout << endl << "\t\t\t\t" << i + 1 << " | ";                   // Print a new line and gap after each row
+    }
+    // Display scores and moves information
+    cout << "\n\n";
+    SetConsoleTextAttribute(h, 3);
+    cout << "\t\t\t\t Current Score: " << score;
+    SetConsoleTextAttribute(h, 12);
+    cout << "\tMoves Left: " << movesLeft << endl;
+    SetConsoleTextAttribute(h, 15);
+    if (movesLeft <= 0)
+        filestr(name, score);
+
+}
+
+
+int main()
+{
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);// for colors
+    string name;
+    int choice, mode;                   // for user to input choice either he wants to play game or some thing else from menu
+    bool cont = true, mod = true;                  //to check user want to continue or not
+    srand(time(0));                   // feed the random number generator outside of the loop
+    //Loading Screnn
+
+    while (cont)
+    {
+        system("pause");
+        system("cls");
+        SetConsoleTextAttribute(h, 3);
+        cout << "\n                      ------------- CANDY CRUSH ----------" << endl;         // to Print menu
+        SetConsoleTextAttribute(h, 15);
+        cout << "\n";
+        cout << "                                1.Play Game             " << endl;        //Press 1 if you want to play game
+        cout << "                                2.How to Play Game      " << endl;        //Press 2 if you want to know how to play game
+        cout << "                                3.Score                 " << endl;
+        cout << "                                4.Credit                " << endl;
+        cout << "                                5.Exit                  " << endl;
+        SetConsoleTextAttribute(h, 3);
+        cout << "                      ------------------------------------" << endl;
+        SetConsoleTextAttribute(h, 15);
+        cout << "\n";
+        cout << "\tEnter your choice : ";          // for user to input choice either he wants to play game or some thing else from menu
+        cin >> choice;
+        switch (choice)
+        {
+        case 1:                   // if user input 1 in choice then game will start
+        {
+            while (mod)
+            {
+                system("cls");
+                cout << endl;
+                SetConsoleTextAttribute(h, 3);
+                cout << "\t\t\t\t--------------- MODE --------------" << endl;
+                SetConsoleTextAttribute(h, 14);
+                cout << "\n\t\t\t\t    1.Easy Mode" << endl;
+                SetConsoleTextAttribute(h, 12);
+                cout << "\n\t\t\t\t    2.Hard Mode" << endl;
+                SetConsoleTextAttribute(h, 3);
+                cout << "\n\t\t\t\t-----------------------------------" << endl;
+                SetConsoleTextAttribute(h, 15);
+                cout << "\t\t\t\t Mode : ";
+                cin >> mode;
+                switch (mode)
+                {              // ------------------------ EASY MODE GAME -----------------------------
+                case 1:                   // if user input 1 in choice then game will start
+                {
+                    char grid[8][8], ch;
+                    cin.ignore();
+                    cout << "\tEnter player name : ";
+                    getline(cin, name);             // to get user name
+                    cout << endl;
+                    system("cls");                       // to clear screen after inputting name from user
+                    for (int i = 0; i < 8; i++)
+                    {
+                        for (int j = 0; j < 8; j++)
+                        {
+                            int n = rand() % 6 + 1;                  //to genrate random number and then assign character
+
+                            if (n == 1)
+                                ch = '$';
+                            else if (n == 2)
+                                ch = '*';
+                            else if (n == 3)
+                                ch = '%';
+                            else if (n == 4)
+                                ch = '&';
+                            else if (n == 5)
+                                ch = '@';
+                            else if (n == 6)
+                                ch = '#';
+                            grid[i][j] = ch;
+                        }
+                    }
+                    int  moves = 10;
+                    while (moves > 0)
+                    {
+                        cout << "\n";
+                        cout << "\t" << name << " Play Game! ";
+                        cout << endl << "\n";
+                        removematches(grid);
+                        fillemptyspaces(grid);
+                        DisplayGrid(grid, moves, name);
+                        cout << endl;
+                        int score = 0;                       //for score
+                        bool found = 1;
+                        bool valid = 1;
+                        int row = 0, col = 0; // Current row and column position of the player's selection
+                        char temp;
+                        int c = 0;
+                        while (valid)
+                        {
+                            cout << "\nEnter row number : ";              //to swap candies
+                            cin >> row;
+                            cout << "\n";
+                            cout << "Enter column number : ";
+                            cin >> col;
+                            cout << "\n";
+                            if (row >= 0 && row < 8 && col >= 0 && col < 8)                               // to check input validation
+                                valid = 0;                   //if valid is false then loop will not be excecuted
+                            else
+                            {
+                                cout << "\nInvalid Input---------> Enter Between 0 and 7." << endl;
+                                valid = 1;              //if valid is true then loop will excecuted 
+                            }
+                        }
+                        cout << "Selected candy : " << grid[row][col];
+                        cout << "\nMove the candy with arraow keys from keyboard : ";
+                        while (found)
+                        {
+                            c = 0;
+                            switch (c = _getch())
+                            {
+                            case KEY_UP:
+                                if (row > 0)
+                                {
+                                    // Swap selected candy with the one above it
+                                    temp = grid[row][col];
+                                    grid[row][col] = grid[row - 1][col];
+                                    grid[row - 1][col] = temp;
+                                    row--;                                   // Update the current row
+                                    found = 0;
+                                }
+                                else if (row == 0)
+                                    cout << "\tInvalid move!!!! \n Enter again: ";               // if user enter wgrong arrow key then program will display error message and take input again
+                                break;
+                            case KEY_DOWN:
+                                if (row < 7)
+                                {
+                                    // Swap selected candy with the one below it
+                                    temp = grid[row][col];                      // storing selected candy into temporary variable
+                                    grid[row][col] = grid[row + 1][col];        //swaping the selected candy
+                                    grid[row + 1][col] = temp;                 // swaping that candy with the candy that is stored in temp variable
+                                    row++;                                   // Update the current row
+                                    found = 0;
+                                }
+                                else if (row == 7)
+                                    cout << "\tInvalid move!!!! \n Enter again: ";                // if user enter wgrong arrow key then program will display error message and take input again
+                                break;
+                            case KEY_LEFT:
+                                if (col > 0)
+                                {
+                                    // Swap selected candy with the one to the left
+                                    temp = grid[row][col];
+                                    grid[row][col] = grid[row][col - 1];
+                                    grid[row][col - 1] = temp;
+                                    col--;                                 // Update the current column
+                                    found = 0;
+                                }
+                                else if (col == 0)
+                                    cout << "\tInvalid move!!!! \n Enter again: ";         // if user enter wgrong arrow key then program will display error message and take input again
+                                break;
+                            case KEY_RIGHT:
+                                if (col < 7)
+                                {
+                                    // Swap selected candy with the one to the right
+                                    temp = grid[row][col]; grid[row][col] = grid[row][col + 1];
+                                    grid[row][col + 1] = temp;
+                                    col++;                                     // Update the current column
+                                    found = 0;
+                                }
+                                else if (col == 7)
+                                    cout << "\tInvalid move!!!! \n Enter again: ";           // if user enter wgrong arrow key then program will display error message and take input again
+                                break;
+                            }
+                        }
+                        sweet(grid);
+                        swpspaceeasy(grid);
+                        fillemptyspaces(grid);
+                        DisplayGrid(grid, moves, name);
+                        system("cls");
+                        moves--;
+                    }
+                    if (moves == 0)
+                        filestr(name, score);
+                    break;
+                }
+                case 2:
+                {
+                    // --------------- HARD MODE GAME --------------------------------
+                    char grid[10][10], ch;        // for hard mode the grid is 10X10
+                    cin.ignore();
+                    cout << endl;
+                    cout << "\tEnter player name : ";
+                    getline(cin, name);             // to get user name
+                    cout << endl;
+                    system("cls");                       // to clear screen after inputting name from user
+                    cout << "\n";
+                    cout << "\t" << name << " Play Game! ";
+                    cout << endl << "\n";
+                    for (int i = 0; i < 10; i++)
+                    {
+                        for (int j = 0; j < 10; j++)
+                        {
+                            int n = rand() % 7 + 1;                  //to genrate random number and then assign character
+                            if (n == 1)
+                                ch = '$';
+                            else if (n == 2)
+                                ch = '*';
+                            else if (n == 3)
+                                ch = '%';
+                            else if (n == 4)
+                                ch = '&';
+                            else if (n == 5)
+                                ch = '@';
+                            else if (n == 6)
+                                ch = '#';
+                            else if (n == 7)
+                                ch = '=';
+                            grid[i][j] = ch;
+                        }
+                    }
+                    int  moves = 15;
+                    while (moves > 0)
+                    {
+                        removematcheshard(grid);
+                        fillemptyspaceshard(grid);
+                        DisplayGridHard(grid, moves, name);
+                        cout << endl;
+                        int score = 0;                       //for score
+                        bool found = 1;
+                        bool valid = 1;
+                        int row = 0, col = 0; // Current row and column position of the player's selection
+                        char temp;
+                        int c = 0;
+                        while (valid)
+                        {
+                            cout << "\nEnter row number : ";              //to swap candies
+                            cin >> row;
+                            cout << "\n";
+                            cout << "Enter column number : ";
+                            cin >> col;
+                            cout << "\n";
+                            if (row >= 0 && row < 10 && col >= 0 && col < 10)                               // to check input validation
+                                valid = 0;                   //if valid is false then loop will not be excecuted
+                            else
+                            {
+                                cout << "\nInvalid Input---------> Enter Between 0 and 7." << endl;
+                                valid = 1;              //if valid is true then loop will excecuted 
+                            }
+                        }
+                        cout << "Selected candy : " << grid[row][col];
+                        cout << "\nMove the candy with arraow keys from keyboard : ";
+                        while (found)
+                        {
+                            c = 0;
+                            switch (c = _getch())
+                            {
+                            case KEY_UP:
+                                if (row > 0)
+                                {
+                                    // Swap selected candy with the one above it
+                                    temp = grid[row][col];
+                                    grid[row][col] = grid[row - 1][col];
+                                    grid[row - 1][col] = temp;
+                                    row--;                                   // Update the current row
+                                    found = 0;
+                                }
+                                else if (row == 0)
+                                    cout << "\tInvalid move!!!! \n Enter again: ";               // if user enter wgrong arrow key then program will display error message and take input again
+                                break;
+                            case KEY_DOWN:
+                                if (row < 9)
+                                {
+                                    // Swap selected candy with the one below it
+                                    temp = grid[row][col];                      // storing selected candy into temporary variable
+                                    grid[row][col] = grid[row + 1][col];        //swaping the selected candy
+                                    grid[row + 1][col] = temp;                 // swaping that candy with the candy that is stored in temp variable
+                                    row++;                                   // Update the current row
+                                    found = 0;
+                                }
+                                else if (row == 9)
+                                    cout << "\tInvalid move!!!! \n Enter again: ";          // if user enter wgrong arrow key then program will display error message and take input again
+                                break;
+                            case KEY_LEFT:
+                                if (col > 0)
+                                {
+                                    // Swap selected candy with the one to the left
+                                    temp = grid[row][col];
+                                    grid[row][col] = grid[row][col - 1];
+                                    grid[row][col - 1] = temp;
+                                    col--;                                 // Update the current column
+                                    found = 0;
+                                }
+                                else if (col == 0)
+                                    cout << "\tInvalid move!!!! \n Enter again: ";             // if user enter wgrong arrow key then program will display error message and take input again
+                                break;
+                            case KEY_RIGHT:
+                                if (col < 9)
+                                {
+                                    // Swap selected candy with the one to the right
+                                    temp = grid[row][col]; grid[row][col] = grid[row][col + 1];
+                                    grid[row][col + 1] = temp;
+                                    col++;                                     // Update the current column
+                                    found = 0;
+                                }
+                                else if (col == 9)
+                                    cout << "\tInvalid move!!!! \n Enter again: ";     // if user enter wgrong arrow key then program will display error message and take input again
+                                break;
+                            }
+                        }
+                        sweethard(grid);
+                        swpspachard(grid);
+                        fillemptyspaceshard(grid);
+                        DisplayGridHard(grid, moves, name);
+                        system("cls");
+                        moves--;
+                    }
+                    if (moves == 0)
+                        filestr(name, score);
+                    break;
+                }
+                if (mod == false)
+                    cout << "Invalid";
+                }
+
+            }
+
+            //------------------------------ How to Play Game Section ------------------------------
+        case 2:
+        {
+            system("cls");
+            SetConsoleTextAttribute(h, 3);
+            cout << "\n\t\t\t\t---------------------- How to Play ----------------------" << endl;
+            cout << endl;
+            SetConsoleTextAttribute(h, 15);
+            cout << "\t\t\t\t 1.Select \'1\' to Play Game" << endl;
+            cout << "\t\t\t\t 2.You can select ";
+            SetConsoleTextAttribute(h, 14);
+            cout << "\'Easy Mode\'";
+            SetConsoleTextAttribute(h, 15);
+            cout << " or ";
+            SetConsoleTextAttribute(h, 12);
+            cout << "\'Hard Mode\'" << endl;
+            SetConsoleTextAttribute(h, 15);
+            cout << "\t\t\t\t 3.Select Candy by giving row and column number" << endl;
+            cout << "\t\t\t\t 4.Move candy with arrow keys" << endl;
+            SetConsoleTextAttribute(h, 3);
+            cout << "\n\t\t\t\t---------------------------------------------------------" << endl;
+            SetConsoleTextAttribute(h, 15);
+
+        }
+        break;
+        //------------------------------Score Section------------------------------
+        case 3:
+        {
+            system("cls");
+            cout << "\n\t\t\t\t---------------- Score ---------------" << endl;
+            ifstream my_input_file("score.txt");
+            if (!my_input_file.is_open())
+            {
+                cout << "File cannot be opened.";
+                return 0;
+            }
+
+            cout << "SCORE!: \n";
+            string line;
+            while (getline(my_input_file, line))
+            {
+                cout << line << endl; // Output each line
+            }
+            my_input_file.close();
+
+
+        }
+        break;
+        //--------------------------------- Credit Section-------------------------------------------
+        case 4:      // when user press 4 from menu
+        {
+
+            system("cls");
+            SetConsoleTextAttribute(h, 3);
+            cout << "\n\t\t\t\t---------------- Credit ---------------" << endl;
+            SetConsoleTextAttribute(h, 15);
+
+            string name1 = "\t\t\t\t     Omaima Khan\t23F-0770";
+            cout << endl << endl;
+
+
+            credit(name1);
+
+            SetConsoleTextAttribute(h, 3);
+            cout << "\n\t\t\t\t----------------------------------------" << endl;
+            SetConsoleTextAttribute(h, 15);
+            break;
+        }
+        //----------------------------- Exit Section ------------------------------------------------
+        case 5:      // when user press 5 from menu
+        {
+            cont = false;
+            system("cls");
+            SetConsoleTextAttribute(h, 15);
+            cout << "\n\n\n\n\n\t\t\t\t\t--------- GAME OVER! ---------\n\n\n" << endl;
+            SetConsoleTextAttribute(h, 15);
+            break;
+        }
+        default:
+        {
+            cout << "Wrong choice try again\n";
+            break;
+
+        }
+        }
+        }
+    }
+
+    system("pause");
+
+    return 0;
+}
